@@ -18,6 +18,9 @@ import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CordovaWebView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
 public class ScottsBeacon extends CordovaPlugin implements BootstrapNotifier {
 
     public static final String TAG = ScottsBeacon.class.getSimpleName();
@@ -29,6 +32,11 @@ public class ScottsBeacon extends CordovaPlugin implements BootstrapNotifier {
 
     public ScottsBeacon() {
         Log.d(TAG, "ScottsBeacon");
+    }
+
+    @Override
+    public boolean execute(String action, JSONArray data, CallbackContext callbackContext) throws JSONException {
+        return action.equals("initializeScottsBeacon");
     }
 
     /**

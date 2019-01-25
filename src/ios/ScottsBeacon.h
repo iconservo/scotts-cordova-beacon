@@ -8,4 +8,6 @@
 
 @property (retain) CLLocationManager *locationManager;
 
+- (void) initializeScottsBeacon:(CDVInvokedUrlCommand*)command;
+
 @end

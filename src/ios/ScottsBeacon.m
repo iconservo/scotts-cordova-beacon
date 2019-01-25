@@ -24,6 +24,13 @@
     [self.locationManager.startMonitoringForRegion:region];
 }
 
+- (void)initializeScottsBeacon:(CDVInvokedUrlCommand*)command
+{
+    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+}
+
 # pragma mark CLLocationManagerDelegate
 
 - (void)locationManager:(CLLocationManager *)manager didDetermineState:(CLRegionState)state forRegion:(CLRegion *)region {
