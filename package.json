@@ -1,0 +1,24 @@
+{
+  "name": "com.scotts.cordova.beacon",
+  "version": "1.0.0",
+  "description": "Scotts Beacon Monitoring",
+  "cordova": {
+    "id": "com.scotts.cordova.beacon",
+    "platforms": [
+      "ios",
+      "android"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pni-ciklum/scotts-cordova-beacon.git"
+  },
+  "keywords": [
+  ],
+  "author": "Peter Nilsson <pni@ciklum.com>",
+  "license": "Apache 2.0",
+  "bugs": {
+    "url": "https://github.com/pni-ciklum/scotts-cordova-beacon/issues"
+  },
+  "homepage": "https://github.com/pni-ciklum/scotts-cordova-beacon"
+}

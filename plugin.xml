@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='utf-8'?>
+<plugin id="com.scotts.cordova.beacon" version="1.0.0" xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <name>Scotts Beacon Monitoring</name>
+    <description>Scotts Beacon Monitoring</description>
+    <license>Apache 2.0</license>
+    <keywords></keywords>
+    <repo>https://github.com/pni-ciklum/scotts-cordova-beacon.git</repo>
+
+    <dependency id="cordova-plugin-device" version="*" />
+
+    <js-module name="ScottsBeacon" src="www/ScottsBeacon.js">
+        <merges target="cordova.plugins"/>
+    </js-module>
+
+    <platform name="ios">
+
+        <config-file parent="/*" target="config.xml">
+            <feature name="ScottsBeacon">
+                <param name="ios-package" value="ScottsBeacon"/>
+            </feature>
+        </config-file>
+
+        <config-file target="*-Info.plist" parent="NSLocationAlwaysUsageDescription">
+            <string>This app would like to scan for beacons even when in the background.</string>
+        </config-file>
+
+        <header-file src="src/ios/ScottsBeacon.h"/>
+        <source-file src="src/ios/ScottsBeacon.m"/>
+
+        <header-file src="src/ios/AppDelegate+ScottsBeacon.h"/>
+        <source-file src="src/ios/AppDelegate+ScottsBeacon.m"/>
+
+        <framework src="CoreLocation.framework" />
+
+    </platform>
+
+    <platform name="android">
+        <config-file target="res/xml/config.xml" parent="/*">
+            <feature name="ScottsBeacon" >
+                <param name="android-package" value="com.scotts.cordova.beacon.ScottsBeacon"/>
+            </feature>
+        </config-file>
+
+        <config-file target="AndroidManifest.xml" parent="/manifest">
+			<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+        </config-file>
+
+        <source-file src="src/android/ScottsBeacon.java" target-dir="src/com/scotts/cordova/beacon" />
+
+        <framework src="src/android/scotts-cordova-beacon.gradle" custom="true" type="gradleReference" />
+        <framework src="com.android.support:support-core-utils:26+" />
+    </platform>
+
+</plugin>
