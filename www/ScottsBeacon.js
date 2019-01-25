@@ -1,11 +1,9 @@
 /*global cordova, module*/
 
-console.log('ScottsBeacon is present.');
+console.log('ScottsBeacon is present. Run cordova.plugins.initializeScottsBeacon() to launch.');
 
-var ScottsBeacon = {
+module.exports = {
     initializeScottsBeacon: function (successCallback, errorCallback) {
         cordova.exec(successCallback, errorCallback, 'ScottsBeacon', 'initializeScottsBeacon', []);
     }
 };
-
-module.exports = ScottsBeacon
