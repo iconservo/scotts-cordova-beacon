@@ -47,9 +47,12 @@
         </config-file>
 
         <source-file src="src/android/ScottsBeacon.java" target-dir="src/com/scotts/cordova/beacon" />
+        <source-file src="src/android/ScottsBeaconApplication.java" target-dir="src/com/scotts/cordova/beacon" />
 
         <framework src="src/android/scotts-cordova-beacon.gradle" custom="true" type="gradleReference" />
         <framework src="com.android.support:support-core-utils:26+" />
+
+        <hook type="after_prepare" src="set_custom_application.js" />
     </platform>
 
 </plugin>
