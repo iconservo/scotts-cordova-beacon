@@ -42,6 +42,10 @@ public class ScottsBeaconApplication extends Application implements BootstrapNot
     @Override
     public void didDetermineStateForRegion(int state, Region region) {
         Log.d(TAG, "didDetermineStateForRegion: " + state + ", " + (region == null ? "-" : region.toString()));
+
+        if (state == BootstrapNotifier.INSIDE) {
+            this.didEnterRegion(region);
+        }
     }
 
     @Override
