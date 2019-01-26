@@ -1,6 +1,9 @@
 #import "AppDelegate.h"
+#import <CoreLocation/CoreLocation.h>
 
-@interface AppDelegate (ScottsBeacon)
+@interface AppDelegate (ScottsBeacon) <CLLocationManagerDelegate>
+
+@property (strong, nonatomic) CLLocationManager *locationManager;
 
 @property UIBackgroundTaskIdentifier backgroundTaskIdentifier;
 

@@ -1,12 +1,9 @@
 #import <Cordova/CDV.h>
 #import <Foundation/Foundation.h>
-#import <CoreLocation/CoreLocation.h>
 
-@interface ScottsBeacon : CDVPlugin<CLLocationManagerDelegate> {
+@interface ScottsBeacon : CDVPlugin {
 
 }
-
-@property (retain) CLLocationManager *locationManager;
 
 - (void) initializeScottsBeacon:(CDVInvokedUrlCommand*)command;
 
