@@ -4,7 +4,9 @@ import android.app.Application;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.util.Log;
 
@@ -74,10 +76,13 @@ public class ScottsBeaconApplication extends Application implements BootstrapNot
         Log.d(TAG, "didEnterRegion: " + (region == null ? "-" : region.toString()));
 
         Notification.Builder notificationBuilder = new Notification.Builder(this);
+        notificationBuilder.setAutoCancel(true);
         notificationBuilder.setSmallIcon(android.R.drawable.stat_notify_error);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             notificationBuilder.setChannelId(CHANNEL_ID);
         }
+        notificationBuilder.setContentIntent(PendingIntent.getActivity(this, 0,
+            new Intent(this, com.scotts.mg12.MainActivity.class), Intent.FLAG_ACTIVITY_NEW_TASK));
 
         if (WATER.equals(region.getUniqueId())) {
             Log.d(TAG, "Found WATER beacon.");
