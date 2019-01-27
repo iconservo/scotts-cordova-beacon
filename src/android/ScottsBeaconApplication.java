@@ -5,6 +5,7 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
+import android.os.Build;
 import android.util.Log;
 
 import java.lang.Exception;
@@ -32,11 +33,13 @@ public class ScottsBeaconApplication extends Application implements BootstrapNot
     public void onCreate() {
         Log.d(TAG, "onCreate");
 
-        NotificationManager notificationManager =
-                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.createNotificationChannel(
-            new NotificationChannel(CHANNEL_ID, "Miracle-Gro Twelve",
-                NotificationManager.IMPORTANCE_HIGH));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationManager notificationManager =
+                        (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.createNotificationChannel(
+                new NotificationChannel(CHANNEL_ID, "Miracle-Gro Twelve",
+                    NotificationManager.IMPORTANCE_HIGH));
+        }
 
         mBeaconManager = BeaconManager.getInstanceForApplication(this);
         mBeaconManager.getBeaconParsers().add(
@@ -72,7 +75,9 @@ public class ScottsBeaconApplication extends Application implements BootstrapNot
 
         Notification.Builder notificationBuilder = new Notification.Builder(this);
         notificationBuilder.setSmallIcon(android.R.drawable.stat_notify_error);
-        notificationBuilder.setChannelId(CHANNEL_ID);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            notificationBuilder.setChannelId(CHANNEL_ID);
+        }
 
         if (WATER.equals(region.getUniqueId())) {
             Log.d(TAG, "Found WATER beacon.");
