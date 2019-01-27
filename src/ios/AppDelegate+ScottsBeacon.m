@@ -47,6 +47,7 @@ NSString const *pump = @"com.scotts.beacon.mg12.pump";
         [self requestMoreBackgroundExecutionTime];
     }
 
+    [self initNotifications];
     [self initLocationManager];
     
     return [self xxx_application:application didFinishLaunchingWithOptions:launchOptions];
@@ -71,6 +72,17 @@ NSString const *pump = @"com.scotts.beacon.mg12.pump";
     self.backgroundTaskIdentifier = [application beginBackgroundTaskWithExpirationHandler:^{
         self.backgroundTaskIdentifier = UIBackgroundTaskInvalid;
 
+    }];
+}
+
+- (void)initNotifications {
+    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+    UNAuthorizationOptions options = UNAuthorizationOptionAlert + UNAuthorizationOptionSound;
+    [center requestAuthorizationWithOptions:options
+        completionHandler:^(BOOL granted, NSError * _Nullable error) {
+        if (!granted) {
+            NSLog(@"initNotifications: authorization not granted");
+        }
     }];
 }
 
@@ -101,11 +113,32 @@ NSString const *pump = @"com.scotts.beacon.mg12.pump";
 -(void)locationManager:(CLLocationManager *)manager didEnterRegion:(CLRegion *)region {
     NSLog(@"didEnterRegion: %@", region);
 
+    UNMutableNotificationContent *content = [[UNMutableNotificationContent alloc] init];
+    content.sound = [UNNotificationSound defaultSound];
+
     if ([region.identifier isEqualToString:water]) {
         NSLog(@"Found WATER beacon.");
+        content.title = @"Low Water Level";
+        content.body = @"The water level is low. Please refill the water tank.";
     } else if ([region.identifier isEqualToString:pump]) {
         NSLog(@"Found PUMP beacon.");
+        content.title = @"Pump Failure";
+        content.body = @"The pump is not running. Please check your device.";
     }
+
+    UNTimeIntervalNotificationTrigger *trigger =
+        [UNTimeIntervalNotificationTrigger triggerWithTimeInterval:10 repeats:NO];
+
+    UNNotificationRequest *notificationRequest =
+        [UNNotificationRequest requestWithIdentifier:region.identifier content:content trigger:trigger]
+
+    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+    [center removePendingNotificationRequestsWithIdentifiers: @[region.identifier]];
+    [center addNotificationRequest:notificationRequest withCompletionHandler:^(NSError * _Nullable error) {
+        if (error != nil) {
+            NSLog(@"didEnterRegion: notification failed");
+        }
+    }];
 }
 
 -(void)locationManager:(CLLocationManager *)manager didExitRegion:(CLRegion *)region {
