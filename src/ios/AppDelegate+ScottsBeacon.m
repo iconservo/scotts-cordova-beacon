@@ -3,10 +3,10 @@
 
 @implementation AppDelegate (ScottsBeacon)
 
-NSString const *key = @"com.scotts.beacon.locationmanager.key";
+NSString * const key = @"com.scotts.beacon.locationmanager.key";
 
-NSString const *water = @"com.scotts.beacon.mg12.water";
-NSString const *pump = @"com.scotts.beacon.mg12.pump";
+NSString * const water = @"com.scotts.beacon.mg12.water";
+NSString * const pump = @"com.scotts.beacon.mg12.pump";
 
 - (void)setLocationManager:(CLLocationManager *)locationManager {
     objc_setAssociatedObject(self, &key, locationManager, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
@@ -130,7 +130,7 @@ NSString const *pump = @"com.scotts.beacon.mg12.pump";
         [UNTimeIntervalNotificationTrigger triggerWithTimeInterval:10 repeats:NO];
 
     UNNotificationRequest *notificationRequest =
-        [UNNotificationRequest requestWithIdentifier:region.identifier content:content trigger:trigger]
+        [UNNotificationRequest requestWithIdentifier:region.identifier content:content trigger:trigger];
 
     UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
     [center removePendingNotificationRequestsWithIdentifiers: @[region.identifier]];
