@@ -3,7 +3,7 @@
 
 @implementation AppDelegate (ScottsBeacon)
 
-NSString const *key = @"scottsbeacon.locationmanager.key";
+NSString const *key = @"com.scotts.beacon.locationmanager.key";
 
 NSString const *water = @"com.scotts.beacon.mg12.water";
 NSString const *pump = @"com.scotts.beacon.mg12.pump";
