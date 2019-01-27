@@ -5,6 +5,9 @@
 
 NSString const *key = @"scottsbeacon.locationmanager.key";
 
+NSString const *water = @"com.scotts.beacon.mg12.water";
+NSString const *pump = @"com.scotts.beacon.mg12.pump";
+
 - (void)setLocationManager:(CLLocationManager *)locationManager {
     objc_setAssociatedObject(self, &key, locationManager, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
@@ -77,12 +80,12 @@ NSString const *key = @"scottsbeacon.locationmanager.key";
 
     [self.locationManager requestAlwaysAuthorization];
 
-    NSString *identifier = @"mg12beacon";
     NSUUID *uuid = [[NSUUID alloc] initWithUUIDString:@"58a78bf8-e280-48a4-8668-b8d8cf947cf8"];
+    [self.locationManager startMonitoringForRegion:[[CLBeaconRegion alloc]
+        initWithProximityUUID:uuid major:1 minor:64 identifier:water]];
+    [self.locationManager startMonitoringForRegion:[[CLBeaconRegion alloc]
+        initWithProximityUUID:uuid major:1 minor:32 identifier:pump]];
 
-    CLBeaconRegion *region = [[CLBeaconRegion alloc] initWithProximityUUID:uuid identifier:identifier];
-
-    [self.locationManager startMonitoringForRegion:region];
 }
 
 # pragma mark CLLocationManagerDelegate
@@ -98,13 +101,21 @@ NSString const *key = @"scottsbeacon.locationmanager.key";
 -(void)locationManager:(CLLocationManager *)manager didEnterRegion:(CLRegion *)region {
     NSLog(@"didEnterRegion: %@", region);
 
-    [self.locationManager startRangingBeaconsInRegion:region];
+    if ([region.identifier isEqualToString:water]) {
+        NSLog(@"Found WATER beacon.");
+    } else if ([region.identifier isEqualToString:pump]) {
+        NSLog(@"Found PUMP beacon.");
+    }
 }
 
 -(void)locationManager:(CLLocationManager *)manager didExitRegion:(CLRegion *)region {
     NSLog(@"didExitRegion: %@", region);
 
-    [self.locationManager stopRangingBeaconsInRegion:region];
+    if ([region.identifier isEqualToString:water]) {
+        NSLog(@"Lost WATER beacon.");
+    } else if ([region.identifier isEqualToString:pump]) {
+        NSLog(@"Lost PUMP beacon.");
+    }
 }
 
 - (void)locationManager:(CLLocationManager *)manager didStartMonitoringForRegion:(CLRegion *)region {
@@ -115,14 +126,6 @@ NSString const *key = @"scottsbeacon.locationmanager.key";
 
 - (void)locationManager:(CLLocationManager *)manager monitoringDidFailForRegion:(CLRegion *)region withError:(NSError *)error {
     NSLog(@"monitoringDidFailForRegion: %@", region);
-}
-
-- (void)locationManager:(CLLocationManager *)manager didRangeBeacons:(NSArray *)beacons inRegion:(CLBeaconRegion *)region {
-    NSLog(@"didRangeBeacons: %@", region);
-
-    for (CLBeacon* beacon in beacons) {
-        NSLog(@"didRangeBeacons: beacon: %@", beacon);
-    }
 }
 
 @end

@@ -10,14 +10,16 @@ import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconManager;
 import org.altbeacon.beacon.BeaconParser;
 import org.altbeacon.beacon.Identifier;
-import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.Region;
 import org.altbeacon.beacon.startup.BootstrapNotifier;
 import org.altbeacon.beacon.startup.RegionBootstrap;
 
-public class ScottsBeaconApplication extends Application implements BootstrapNotifier, RangeNotifier {
+public class ScottsBeaconApplication extends Application implements BootstrapNotifier {
 
     public static final String TAG = ScottsBeaconApplication.class.getSimpleName();
+
+    private static final String WATER = "com.scotts.beacon.mg12.water";
+    private static final String PUMP = "com.scotts.beacon.mg12.pump";
 
     private RegionBootstrap mRegionBootstrap;
     private BeaconManager mBeaconManager;
@@ -32,10 +34,16 @@ public class ScottsBeaconApplication extends Application implements BootstrapNot
         mBeaconManager.setRangeNotifier(this);
 
         mRegionBootstrap = new RegionBootstrap(this,
-                new Region("water_low",
+                new Region(WATER,
                         Identifier.parse("58A78BF8-E280-48A4-8668-B8D8CF947CF8"),
                         Identifier.parse("1"),
                         Identifier.parse("64"))
+        );
+        mRegionBootstrap.addRegion(
+            new Region(PUMP,
+                        Identifier.parse("58A78BF8-E280-48A4-8668-B8D8CF947CF8"),
+                        Identifier.parse("1"),
+                        Identifier.parse("32"))
         );
     }
 
@@ -52,10 +60,10 @@ public class ScottsBeaconApplication extends Application implements BootstrapNot
     public void didEnterRegion(Region region) {
         Log.d(TAG, "didEnterRegion: " + (region == null ? "-" : region.toString()));
 
-        try {
-            mBeaconManager.startRangingBeaconsInRegion(region);
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (WATER.equals(region.getUniqueId())) {
+            Log.d(TAG, "Found WATER beacon.");
+        } else if (PUMP.equals(region.getUniqueId())) {
+            Log.d(TAG, "Found PUMP beacon.");
         }
     }
 
@@ -63,22 +71,10 @@ public class ScottsBeaconApplication extends Application implements BootstrapNot
     public void didExitRegion(Region region) {
         Log.d(TAG, "didExitRegion: " + (region == null ? "-" : region.toString()));
 
-        try {
-            mBeaconManager.stopRangingBeaconsInRegion(region);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void didRangeBeaconsInRegion(Collection<Beacon> beacons, Region region) {
-        Log.d(TAG, "didRangeBeaconsInRegion: " + (region == null ? "-" : region.toString()));
-        if (beacons == null || beacons.size() == 0) {
-            Log.d(TAG, "didRangeBeaconsInRegion: no beacons");
-        } else {
-            for (Beacon beacon : beacons) {
-                Log.d(TAG, "didRangeBeaconsInRegion: found " + beacon.toString());
-            }
+        if (WATER.equals(region.getUniqueId())) {
+            Log.d(TAG, "Lost WATER beacon.");
+        } else if (PUMP.equals(region.getUniqueId())) {
+            Log.d(TAG, "Lost PUMP beacon.");
         }
     }
 }
