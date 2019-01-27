@@ -1,6 +1,10 @@
 package com.scotts.cordova.beacon;
 
 import android.app.Application;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.util.Log;
 
 import java.lang.Exception;
@@ -20,6 +24,7 @@ public class ScottsBeaconApplication extends Application implements BootstrapNot
 
     private static final String WATER = "com.scotts.beacon.mg12.water";
     private static final String PUMP = "com.scotts.beacon.mg12.pump";
+    private static final String CHANNEL_ID = "com.scotts.beacon.mg12.notification";
 
     private RegionBootstrap mRegionBootstrap;
     private BeaconManager mBeaconManager;
@@ -27,11 +32,16 @@ public class ScottsBeaconApplication extends Application implements BootstrapNot
     public void onCreate() {
         Log.d(TAG, "onCreate");
 
+        NotificationManager notificationManager =
+                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.createNotificationChannel(
+            new NotificationChannel(CHANNEL_ID, "Miracle-Gro Twelve",
+                NotificationManager.IMPORTANCE_HIGH));
+
         mBeaconManager = BeaconManager.getInstanceForApplication(this);
         mBeaconManager.getBeaconParsers().add(
                 new BeaconParser().setBeaconLayout("m:0-3=4c000215,i:4-19,i:20-21,i:22-23,p:24-24")
         );
-        mBeaconManager.setRangeNotifier(this);
 
         mRegionBootstrap = new RegionBootstrap(this,
                 new Region(WATER,
@@ -60,11 +70,23 @@ public class ScottsBeaconApplication extends Application implements BootstrapNot
     public void didEnterRegion(Region region) {
         Log.d(TAG, "didEnterRegion: " + (region == null ? "-" : region.toString()));
 
+        Notification.Builder notificationBuilder = new Notification.Builder(this);
+        notificationBuilder.setSmallIcon(android.R.drawable.stat_notify_error);
+        notificationBuilder.setChannelId(CHANNEL_ID);
+
         if (WATER.equals(region.getUniqueId())) {
             Log.d(TAG, "Found WATER beacon.");
+            notificationBuilder.setContentTitle("Low Water Level");
+            notificationBuilder.setContentText("The water level is low. Please refill the water tank.");
         } else if (PUMP.equals(region.getUniqueId())) {
             Log.d(TAG, "Found PUMP beacon.");
+            notificationBuilder.setContentTitle("Pump Failure");
+            notificationBuilder.setContentText("The pump is not running. Please check your device.");
         }
+
+        NotificationManager notificationManager =
+                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(0, notificationBuilder.build());
     }
 
     @Override
