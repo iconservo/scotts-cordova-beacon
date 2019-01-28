@@ -8,7 +8,7 @@ NSString * const key = @"com.scotts.beacon.locationmanager.key";
 NSString * const water = @"com.scotts.beacon.mg12.water";
 NSString * const pump = @"com.scotts.beacon.mg12.pump";
 
-BOOL isRunning = FALSE;
+BOOL launchedByBeacon = FALSE;
 
 - (void)setLocationManager:(CLLocationManager *)locationManager {
     objc_setAssociatedObject(self, &key, locationManager, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
@@ -47,9 +47,13 @@ BOOL isRunning = FALSE;
     
     if (!launchedWithoutOptions) {
         [self requestMoreBackgroundExecutionTime];
-    }
 
-    isRunning = TRUE;
+        if ([launchOptions objectForKey:UIApplicationLaunchOptionsLocationKey]) {
+            launchedByBeacon = TRUE;
+        } else {
+            launchedByBeacon = FALSE;
+        }
+    }
 
     [self initNotifications];
     [self initLocationManager];
@@ -109,16 +113,17 @@ BOOL isRunning = FALSE;
 - (void)locationManager:(CLLocationManager *)manager didDetermineState:(CLRegionState)state forRegion:(CLRegion *)region {
     NSLog(@"didDetermineState: %i %@", state, region);
 
-    if ([region isKindOfClass:[CLBeaconRegion class]] && state == CLRegionStateInside) {
-        [self locationManager:manager didEnterRegion:region];
-    }
+    //if ([region isKindOfClass:[CLBeaconRegion class]] && state == CLRegionStateInside) {
+    //    [self locationManager:manager didEnterRegion:region];
+    //}
 }
 
 -(void)locationManager:(CLLocationManager *)manager didEnterRegion:(CLRegion *)region {
     NSLog(@"didEnterRegion: %@", region);
 
-    if (isRunning) {
+    if (launchedByBeacon) {
         NSLog(@"App is running. Ignoring beacons.");
+        return;
     }
 
     UNMutableNotificationContent *content = [[UNMutableNotificationContent alloc] init];
@@ -127,11 +132,11 @@ BOOL isRunning = FALSE;
     if ([region.identifier isEqualToString:water]) {
         NSLog(@"Found WATER beacon.");
         content.title = @"Low Water Level";
-        content.body = @"The water level is low. Please refill the water tank.";
+        content.body = @"Please refill the water tank.";
     } else if ([region.identifier isEqualToString:pump]) {
         NSLog(@"Found PUMP beacon.");
         content.title = @"Pump Failure";
-        content.body = @"The pump is not running. Please check your device.";
+        content.body = @"Please check the pump.";
     }
 
     UNTimeIntervalNotificationTrigger *trigger =

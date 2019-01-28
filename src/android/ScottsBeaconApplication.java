@@ -73,9 +73,9 @@ public class ScottsBeaconApplication extends Application implements BootstrapNot
     public void didDetermineStateForRegion(int state, Region region) {
         Log.d(TAG, "didDetermineStateForRegion: " + state + ", " + (region == null ? "-" : region.toString()));
 
-        if (state == BootstrapNotifier.INSIDE) {
-            this.didEnterRegion(region);
-        }
+        //if (state == BootstrapNotifier.INSIDE) {
+        //    this.didEnterRegion(region);
+        //}
     }
 
     @Override
@@ -84,6 +84,7 @@ public class ScottsBeaconApplication extends Application implements BootstrapNot
 
         if (mIsRunning) {
             Log.d(TAG, "App is running. Ignoring beacons.");
+            return;
         }
 
         Notification.Builder notificationBuilder = new Notification.Builder(this);
@@ -93,24 +94,25 @@ public class ScottsBeaconApplication extends Application implements BootstrapNot
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             notificationBuilder.setChannelId(CHANNEL_ID);
         }
-        notificationBuilder.setContentIntent(PendingIntent.getActivity(this, 0,
-            new Intent(this, com.scotts.mg12.MainActivity.class), Intent.FLAG_ACTIVITY_NEW_TASK));
+        notificationBuilder.setContentIntent(PendingIntent.getActivity(this, 0xBEAC,
+            new Intent(this, com.scotts.mg12.MainActivity.class),
+            Intent.FLAG_ACTIVITY_NEW_TASK | PendingIntent.FLAG_CANCEL_CURRENT));
 
         if (WATER.equals(region.getUniqueId())) {
             Log.d(TAG, "Found WATER beacon.");
             notificationBuilder.setContentTitle("Low Water Level");
-            notificationBuilder.setContentText("The water level is low. Please refill the water tank.");
+            notificationBuilder.setContentText("Please refill the water tank.");
         } else if (PUMP.equals(region.getUniqueId())) {
             Log.d(TAG, "Found PUMP beacon.");
             notificationBuilder.setContentTitle("Pump Failure");
-            notificationBuilder.setContentText("The pump is not running. Please check your device.");
+            notificationBuilder.setContentText("Please check the pump.");
         } else {
             return;
         }
 
         NotificationManager notificationManager =
                     (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(0, notificationBuilder.build());
+        notificationManager.notify(0xBEAC, notificationBuilder.build());
     }
 
     @Override
