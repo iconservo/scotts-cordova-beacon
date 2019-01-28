@@ -3,18 +3,8 @@
 
 @implementation AppDelegate (ScottsBeacon)
 
-NSString * const key = @"com.scotts.beacon.locationmanager.key";
-
 NSString * const water = @"com.scotts.beacon.mg12.water";
 NSString * const pump = @"com.scotts.beacon.mg12.pump";
-
-- (void)setLocationManager:(CLLocationManager *)locationManager {
-    objc_setAssociatedObject(self, &key, locationManager, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-}
-
-- (CLLocationManager *)locationManager {
-    return objc_getAssociatedObject(self, &key);
-}
 
 + (void)load {
     static dispatch_once_t onceToken;
@@ -42,23 +32,37 @@ NSString * const pump = @"com.scotts.beacon.mg12.pump";
 - (BOOL) xxx_application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 
     BOOL launchedWithoutOptions = launchOptions == nil;
-    
+
+    CLLocationManager *locationManager = [[CLLocationManager alloc] init];
+
     if (!launchedWithoutOptions) {
         if ([launchOptions objectForKey:UIApplicationLaunchOptionsLocationKey]) {
             NSLog(@"didFinishLaunchingWithOptions: launched by location manager");
             [self requestMoreBackgroundExecutionTime];
+            locationManager.delegate = self;
             NSUUID *uuid = [[NSUUID alloc] initWithUUIDString:@"58a78bf8-e280-48a4-8668-b8d8cf947cf8"];
-            [self.locationManager startMonitoringForRegion:[[CLBeaconRegion alloc]
+            [locationManager startMonitoringForRegion:[[CLBeaconRegion alloc]
                 initWithProximityUUID:uuid major:1 minor:64 identifier:water]];
-            [self.locationManager startMonitoringForRegion:[[CLBeaconRegion alloc]
+            [locationManager startMonitoringForRegion:[[CLBeaconRegion alloc]
                 initWithProximityUUID:uuid major:1 minor:32 identifier:pump]];
             return TRUE;
         }
     }
 
     NSLog(@"didFinishLaunchingWithOptions: not launched by location manager");
-    [self initNotifications];
-    [self initLocationManager];
+
+    NSLog(@"didFinishLaunchingWithOptions: requesting location authorization");
+    [locationManager requestAlwaysAuthorization];
+
+    NSLog(@"didFinishLaunchingWithOptions: requesting notification authorization");
+    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+    UNAuthorizationOptions options = UNAuthorizationOptionAlert + UNAuthorizationOptionSound;
+    [center requestAuthorizationWithOptions:options
+        completionHandler:^(BOOL granted, NSError * _Nullable error) {
+        if (!granted) {
+            NSLog(@"didFinishLaunchingWithOptions: notification authorization not granted");
+        }
+    }];
     
     return [self xxx_application:application didFinishLaunchingWithOptions:launchOptions];
 }
@@ -81,24 +85,6 @@ NSString * const pump = @"com.scotts.beacon.mg12.pump";
     self.backgroundTaskIdentifier = [application beginBackgroundTaskWithExpirationHandler:^{
         self.backgroundTaskIdentifier = UIBackgroundTaskInvalid;
     }];
-}
-
-- (void)initNotifications {
-    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
-    UNAuthorizationOptions options = UNAuthorizationOptionAlert + UNAuthorizationOptionSound;
-    [center requestAuthorizationWithOptions:options
-        completionHandler:^(BOOL granted, NSError * _Nullable error) {
-        if (!granted) {
-            NSLog(@"initNotifications: authorization not granted");
-        }
-    }];
-}
-
-- (void)initLocationManager {
-    self.locationManager = [[CLLocationManager alloc] init];
-    self.locationManager.delegate = self;
-
-    [self.locationManager requestAlwaysAuthorization];
 }
 
 # pragma mark CLLocationManagerDelegate

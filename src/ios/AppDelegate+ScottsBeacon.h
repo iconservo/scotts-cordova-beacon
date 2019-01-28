@@ -4,8 +4,6 @@
 
 @interface AppDelegate (ScottsBeacon) <CLLocationManagerDelegate>
 
-@property (strong, nonatomic) CLLocationManager *locationManager;
-
 @property UIBackgroundTaskIdentifier backgroundTaskIdentifier;
 
 - (BOOL) xxx_application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions;
