@@ -33,28 +33,7 @@ NSString * const pump = @"com.scotts.beacon.mg12.pump";
 
     BOOL launchedWithoutOptions = launchOptions == nil;
 
-    CLLocationManager *locationManager = [[CLLocationManager alloc] init];
-
-    if (!launchedWithoutOptions) {
-        if ([launchOptions objectForKey:UIApplicationLaunchOptionsLocationKey]) {
-            NSLog(@"didFinishLaunchingWithOptions: launched by location manager");
-            [self requestMoreBackgroundExecutionTime];
-            locationManager.delegate = self;
-            NSUUID *uuid = [[NSUUID alloc] initWithUUIDString:@"58a78bf8-e280-48a4-8668-b8d8cf947cf8"];
-            [locationManager startMonitoringForRegion:[[CLBeaconRegion alloc]
-                initWithProximityUUID:uuid major:1 minor:64 identifier:water]];
-            [locationManager startMonitoringForRegion:[[CLBeaconRegion alloc]
-                initWithProximityUUID:uuid major:1 minor:32 identifier:pump]];
-            return TRUE;
-        }
-    }
-
-    NSLog(@"didFinishLaunchingWithOptions: not launched by location manager");
-
-    NSLog(@"didFinishLaunchingWithOptions: requesting location authorization");
-    [locationManager requestAlwaysAuthorization];
-
-    NSLog(@"didFinishLaunchingWithOptions: requesting notification authorization");
+    NSLog(@"didFinishLaunchingWithOptions: checking notification authorization");
     UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
     UNAuthorizationOptions options = UNAuthorizationOptionAlert + UNAuthorizationOptionSound;
     [center requestAuthorizationWithOptions:options
@@ -63,7 +42,29 @@ NSString * const pump = @"com.scotts.beacon.mg12.pump";
             NSLog(@"didFinishLaunchingWithOptions: notification authorization not granted");
         }
     }];
-    
+
+    NSLog(@"didFinishLaunchingWithOptions: checking location authorization");
+    CLLocationManager *locationManager = [[CLLocationManager alloc] init];
+    [locationManager requestAlwaysAuthorization];
+
+    NSLog(@"didFinishLaunchingWithOptions: start monitoring beacons");
+    NSUUID *uuid = [[NSUUID alloc] initWithUUIDString:@"58a78bf8-e280-48a4-8668-b8d8cf947cf8"];
+    [locationManager startMonitoringForRegion:[[CLBeaconRegion alloc]
+        initWithProximityUUID:uuid major:1 minor:64 identifier:water]];
+    [locationManager startMonitoringForRegion:[[CLBeaconRegion alloc]
+        initWithProximityUUID:uuid major:1 minor:32 identifier:pump]];
+
+    if (!launchedWithoutOptions) {
+        if ([launchOptions objectForKey:UIApplicationLaunchOptionsLocationKey]) {
+            NSLog(@"didFinishLaunchingWithOptions: launched by location manager");
+            [self requestMoreBackgroundExecutionTime];
+            locationManager.delegate = self;
+            return TRUE;
+        }
+    }
+
+    NSLog(@"didFinishLaunchingWithOptions: not launched by location manager");
+
     return [self xxx_application:application didFinishLaunchingWithOptions:launchOptions];
 }
 
