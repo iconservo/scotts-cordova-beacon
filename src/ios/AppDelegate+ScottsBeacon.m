@@ -8,8 +8,6 @@ NSString * const key = @"com.scotts.beacon.locationmanager.key";
 NSString * const water = @"com.scotts.beacon.mg12.water";
 NSString * const pump = @"com.scotts.beacon.mg12.pump";
 
-BOOL launchedByLocationManager = FALSE;
-
 - (void)setLocationManager:(CLLocationManager *)locationManager {
     objc_setAssociatedObject(self, &key, locationManager, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
@@ -46,22 +44,23 @@ BOOL launchedByLocationManager = FALSE;
     BOOL launchedWithoutOptions = launchOptions == nil;
     
     if (!launchedWithoutOptions) {
-        [self requestMoreBackgroundExecutionTime];
-
         if ([launchOptions objectForKey:UIApplicationLaunchOptionsLocationKey]) {
             NSLog(@"didFinishLaunchingWithOptions: launched by location manager");
-            launchedByLocationManager = TRUE;
-        } else {
-            NSLog(@"didFinishLaunchingWithOptions: not launched by location manager");
-            launchedByLocationManager = FALSE;
+            [self requestMoreBackgroundExecutionTime];
+            NSUUID *uuid = [[NSUUID alloc] initWithUUIDString:@"58a78bf8-e280-48a4-8668-b8d8cf947cf8"];
+            [self.locationManager startMonitoringForRegion:[[CLBeaconRegion alloc]
+                initWithProximityUUID:uuid major:1 minor:64 identifier:water]];
+            [self.locationManager startMonitoringForRegion:[[CLBeaconRegion alloc]
+                initWithProximityUUID:uuid major:1 minor:32 identifier:pump]];
+            return TRUE;
         }
     }
 
+    NSLog(@"didFinishLaunchingWithOptions: not launched by location manager");
     [self initNotifications];
     [self initLocationManager];
     
     return [self xxx_application:application didFinishLaunchingWithOptions:launchOptions];
-    
 }
 
 - (UIBackgroundTaskIdentifier) backgroundTaskIdentifier {
@@ -81,7 +80,6 @@ BOOL launchedByLocationManager = FALSE;
 
     self.backgroundTaskIdentifier = [application beginBackgroundTaskWithExpirationHandler:^{
         self.backgroundTaskIdentifier = UIBackgroundTaskInvalid;
-
     }];
 }
 
@@ -101,32 +99,16 @@ BOOL launchedByLocationManager = FALSE;
     self.locationManager.delegate = self;
 
     [self.locationManager requestAlwaysAuthorization];
-
-    NSUUID *uuid = [[NSUUID alloc] initWithUUIDString:@"58a78bf8-e280-48a4-8668-b8d8cf947cf8"];
-    [self.locationManager startMonitoringForRegion:[[CLBeaconRegion alloc]
-        initWithProximityUUID:uuid major:1 minor:64 identifier:water]];
-    [self.locationManager startMonitoringForRegion:[[CLBeaconRegion alloc]
-        initWithProximityUUID:uuid major:1 minor:32 identifier:pump]];
-
 }
 
 # pragma mark CLLocationManagerDelegate
 
 - (void)locationManager:(CLLocationManager *)manager didDetermineState:(CLRegionState)state forRegion:(CLRegion *)region {
     NSLog(@"didDetermineState: %i %@", state, region);
-
-    //if ([region isKindOfClass:[CLBeaconRegion class]] && state == CLRegionStateInside) {
-    //    [self locationManager:manager didEnterRegion:region];
-    //}
 }
 
 -(void)locationManager:(CLLocationManager *)manager didEnterRegion:(CLRegion *)region {
     NSLog(@"didEnterRegion: %@", region);
-
-    if (!launchedByLocationManager) {
-        NSLog(@"App is running. Ignoring beacons.");
-        return;
-    }
 
     UNMutableNotificationContent *content = [[UNMutableNotificationContent alloc] init];
     content.sound = [UNNotificationSound defaultSound];
