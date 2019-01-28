@@ -8,7 +8,7 @@ NSString * const key = @"com.scotts.beacon.locationmanager.key";
 NSString * const water = @"com.scotts.beacon.mg12.water";
 NSString * const pump = @"com.scotts.beacon.mg12.pump";
 
-BOOL launchedByBeacon = FALSE;
+BOOL launchedByLocationManager = FALSE;
 
 - (void)setLocationManager:(CLLocationManager *)locationManager {
     objc_setAssociatedObject(self, &key, locationManager, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
@@ -49,9 +49,11 @@ BOOL launchedByBeacon = FALSE;
         [self requestMoreBackgroundExecutionTime];
 
         if ([launchOptions objectForKey:UIApplicationLaunchOptionsLocationKey]) {
-            launchedByBeacon = TRUE;
+            NSLog(@"didFinishLaunchingWithOptions: launched by location manager");
+            launchedByLocationManager = TRUE;
         } else {
-            launchedByBeacon = FALSE;
+            NSLog(@"didFinishLaunchingWithOptions: not launched by location manager");
+            launchedByLocationManager = FALSE;
         }
     }
 
@@ -121,7 +123,7 @@ BOOL launchedByBeacon = FALSE;
 -(void)locationManager:(CLLocationManager *)manager didEnterRegion:(CLRegion *)region {
     NSLog(@"didEnterRegion: %@", region);
 
-    if (launchedByBeacon) {
+    if (!launchedByLocationManager) {
         NSLog(@"App is running. Ignoring beacons.");
         return;
     }
