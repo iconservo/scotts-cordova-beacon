@@ -94,9 +94,10 @@ public class ScottsBeaconApplication extends Application implements BootstrapNot
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             notificationBuilder.setChannelId(CHANNEL_ID);
         }
-        notificationBuilder.setContentIntent(PendingIntent.getActivity(this, 0xBEAC,
-            new Intent(this, com.scotts.mg12.MainActivity.class),
-            Intent.FLAG_ACTIVITY_NEW_TASK | PendingIntent.FLAG_CANCEL_CURRENT));
+        Intent intent = new Intent(this, com.scotts.mg12.MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        notificationBuilder.setContentIntent(PendingIntent.getActivity(
+            this, (int) System.currentTimeMillis(), intent, PendingIntent.FLAG_UPDATE_CURRENT));
 
         if (WATER.equals(region.getUniqueId())) {
             Log.d(TAG, "Found WATER beacon.");
@@ -112,6 +113,7 @@ public class ScottsBeaconApplication extends Application implements BootstrapNot
 
         NotificationManager notificationManager =
                     (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.cancel(0xBEAC);
         notificationManager.notify(0xBEAC, notificationBuilder.build());
     }
 
