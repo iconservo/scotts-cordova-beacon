@@ -8,6 +8,8 @@ NSString * const key = @"com.scotts.beacon.locationmanager.key";
 NSString * const water = @"com.scotts.beacon.mg12.water";
 NSString * const pump = @"com.scotts.beacon.mg12.pump";
 
+BOOL isRunning = FALSE;
+
 - (void)setLocationManager:(CLLocationManager *)locationManager {
     objc_setAssociatedObject(self, &key, locationManager, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
@@ -46,6 +48,8 @@ NSString * const pump = @"com.scotts.beacon.mg12.pump";
     if (!launchedWithoutOptions) {
         [self requestMoreBackgroundExecutionTime];
     }
+
+    isRunning = TRUE;
 
     [self initNotifications];
     [self initLocationManager];
@@ -112,6 +116,10 @@ NSString * const pump = @"com.scotts.beacon.mg12.pump";
 
 -(void)locationManager:(CLLocationManager *)manager didEnterRegion:(CLRegion *)region {
     NSLog(@"didEnterRegion: %@", region);
+
+    if (isRunning) {
+        NSLog(@"App is running. Ignoring beacons.");
+    }
 
     UNMutableNotificationContent *content = [[UNMutableNotificationContent alloc] init];
     content.sound = [UNNotificationSound defaultSound];

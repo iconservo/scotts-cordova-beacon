@@ -33,6 +33,12 @@ public class ScottsBeaconApplication extends Application implements BootstrapNot
     private RegionBootstrap mRegionBootstrap;
     private BeaconManager mBeaconManager;
 
+    private boolean mIsRunning;
+
+    public void setIsRunning() {
+        mIsRunning = true;
+    }
+
     public void onCreate() {
         Log.d(TAG, "onCreate");
 
@@ -76,6 +82,10 @@ public class ScottsBeaconApplication extends Application implements BootstrapNot
     public void didEnterRegion(Region region) {
         Log.d(TAG, "didEnterRegion: " + (region == null ? "-" : region.toString()));
 
+        if (mIsRunning) {
+            Log.d(TAG, "App is running. Ignoring beacons.");
+        }
+
         Notification.Builder notificationBuilder = new Notification.Builder(this);
         notificationBuilder.setAutoCancel(true);
         notificationBuilder.setLargeIcon(Icon.createWithResource(this, com.scotts.mg12.R.mipmap.icon));
@@ -94,6 +104,8 @@ public class ScottsBeaconApplication extends Application implements BootstrapNot
             Log.d(TAG, "Found PUMP beacon.");
             notificationBuilder.setContentTitle("Pump Failure");
             notificationBuilder.setContentText("The pump is not running. Please check your device.");
+        } else {
+            return;
         }
 
         NotificationManager notificationManager =

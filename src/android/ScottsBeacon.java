@@ -2,6 +2,8 @@ package com.scotts.cordova.beacon;
 
 import android.util.Log;
 
+import java.lang.Exception;
+
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaPlugin;
@@ -25,6 +27,14 @@ public class ScottsBeacon extends CordovaPlugin {
 
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
         super.initialize(cordova, webView);
+
+        try {
+            ScottsBeaconApplication application =
+                (ScottsBeaconApplication) cordova.getActivity().getApplication();
+            application.setIsRunning();
+        } catch (Exception e) {
+            // Do nothing.
+        }
 
         Log.d(TAG, "initialize: beacons are handled through a custom Application class");
     }
