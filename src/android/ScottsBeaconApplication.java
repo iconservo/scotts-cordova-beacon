@@ -7,6 +7,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Icon;
 import android.os.Build;
 import android.util.Log;
 
@@ -77,6 +78,7 @@ public class ScottsBeaconApplication extends Application implements BootstrapNot
 
         Notification.Builder notificationBuilder = new Notification.Builder(this);
         notificationBuilder.setAutoCancel(true);
+        notificationBuilder.setLargeIcon(Icon.createWithResource(this, com.scotts.mg12.R.mipmap.icon));
         notificationBuilder.setSmallIcon(android.R.drawable.stat_notify_error);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             notificationBuilder.setChannelId(CHANNEL_ID);
