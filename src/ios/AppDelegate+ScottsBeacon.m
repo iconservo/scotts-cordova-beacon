@@ -44,7 +44,7 @@ BOOL wasLaunchedByLocationManager = FALSE;
 - (BOOL) xxx_application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     wasLaunchedByLocationManager = FALSE;
 
-    if (!launchOptions != nil) {
+    if (launchOptions != nil) {
         if ([launchOptions objectForKey:UIApplicationLaunchOptionsLocationKey]) {
             [self requestMoreBackgroundExecutionTime];
             wasLaunchedByLocationManager = TRUE;
