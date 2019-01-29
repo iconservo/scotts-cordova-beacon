@@ -33,17 +33,6 @@ BOOL wasLaunchedByLocationManager = FALSE;
         } else {
             method_exchangeImplementations(originalDFLWOMethod, swizzledDFLWOMethod);
         }
-
-        SEL originalAWEFSelector = @selector(applicationWillEnterForeground:);
-        SEL swizzledAWEFSelector = @selector(xxx_applicationWillEnterForeground:);
-        Method originalAWEFMethod = class_getInstanceMethod(class, originalAWEFSelector);
-        Method swizzledAWEFMethod = class_getInstanceMethod(class, swizzledAWEFSelector);
-        BOOL didAddMethodAWEF = class_addMethod(class, originalAWEFSelector, method_getImplementation(swizzledAWEFMethod), method_getTypeEncoding(swizzledAWEFMethod));
-        if (didAddMethodAWEF) {
-            class_replaceMethod(class, swizzledAWEFSelector, method_getImplementation(originalAWEFMethod), method_getTypeEncoding(originalAWEFMethod));
-        } else {
-            method_exchangeImplementations(originalAWEFMethod, swizzledAWEFMethod);
-        }        
     });
 }
 
@@ -88,7 +77,7 @@ BOOL wasLaunchedByLocationManager = FALSE;
     }
 }
 
-- (void)xxx_applicationWillEnterForeground:(UIApplication *)application {
+- (void)applicationWillEnterForeground:(UIApplication *)application {
     if (wasLaunchedByLocationManager) {
         NSLog(@"applicationWillEnterForeground: launched by location manager");
         wasLaunchedByLocationManager = FALSE;
@@ -96,8 +85,6 @@ BOOL wasLaunchedByLocationManager = FALSE;
     } else {
         NSLog(@"applicationWillEnterForeground: not launched by location manager");
     }
-
-    [self xxx_applicationWillEnterForeground:application];
 }
 
 - (UIBackgroundTaskIdentifier) backgroundTaskIdentifier {
