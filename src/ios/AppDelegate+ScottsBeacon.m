@@ -21,23 +21,29 @@ BOOL wasLaunchedByLocationManager = FALSE;
 + (void)load {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        
         Class class = [self class];
 
-        SEL originalSelector = @selector(application:didFinishLaunchingWithOptions:);
-        SEL swizzledSelector = @selector(xxx_application:didFinishLaunchingWithOptions:);
-        
-        Method originalMethod = class_getInstanceMethod(class, originalSelector);
-        Method swizzledMethod = class_getInstanceMethod(class, swizzledSelector);
-        
-        BOOL didAddMethod = class_addMethod(class, originalSelector, method_getImplementation(swizzledMethod), method_getTypeEncoding(swizzledMethod));
-        
-        if (didAddMethod) {
-            class_replaceMethod(class, swizzledSelector, method_getImplementation(originalMethod), method_getTypeEncoding(originalMethod));
+        SEL originalDFLWOSelector = @selector(application:didFinishLaunchingWithOptions:);
+        SEL swizzledDFLWOSelector = @selector(xxx_application:didFinishLaunchingWithOptions:);
+        Method originalDFLWOMethod = class_getInstanceMethod(class, originalDFLWOSelector);
+        Method swizzledDFLWOMethod = class_getInstanceMethod(class, swizzledDFLWOSelector);
+        BOOL didAddMethodDFLWO = class_addMethod(class, originalDFLWOSelector, method_getImplementation(swizzledDFLWOMethod), method_getTypeEncoding(swizzledDFLWOMethod));
+        if (didAddMethodDFLWO) {
+            class_replaceMethod(class, swizzledDFLWOSelector, method_getImplementation(originalDFLWOMethod), method_getTypeEncoding(originalDFLWOMethod));
         } else {
-            method_exchangeImplementations(originalMethod, swizzledMethod);
+            method_exchangeImplementations(originalDFLWOMethod, swizzledDFLWOMethod);
         }
-        
+
+        SEL originalAWEFSelector = @selector(applicationWillEnterForeground:);
+        SEL swizzledAWEFSelector = @selector(xxx_applicationWillEnterForeground:);
+        Method originalAWEFMethod = class_getInstanceMethod(class, originalAWEFSelector);
+        Method swizzledAWEFMethod = class_getInstanceMethod(class, swizzledAWEFSelector);
+        BOOL didAddMethodAWEF = class_addMethod(class, originalAWEFSelector, method_getImplementation(swizzledAWEFMethod), method_getTypeEncoding(swizzledAWEFMethod));
+        if (didAddMethodAWEF) {
+            class_replaceMethod(class, swizzledAWEFSelector, method_getImplementation(originalAWEFMethod), method_getTypeEncoding(originalAWEFMethod));
+        } else {
+            method_exchangeImplementations(originalAWEFMethod, swizzledAWEFMethod);
+        }        
     });
 }
 
@@ -75,7 +81,23 @@ BOOL wasLaunchedByLocationManager = FALSE;
     [self.locationManager startMonitoringForRegion:[[CLBeaconRegion alloc]
         initWithProximityUUID:uuid major:1 minor:32 identifier:pump]];
 
-    return [self xxx_application:application didFinishLaunchingWithOptions:launchOptions];
+    if (wasLaunchedByLocationManager) {
+        return TRUE;
+    } else {
+        return [self xxx_application:application didFinishLaunchingWithOptions:launchOptions];
+    }
+}
+
+- (void)xxx_applicationWillEnterForeground:(UIApplication *)application {
+    if (wasLaunchedByLocationManager) {
+        NSLog(@"applicationWillEnterForeground: launched by location manager");
+        wasLaunchedByLocationManager = FALSE;
+        [self xxx_application:application didFinishLaunchingWithOptions:nil];
+    } else {
+        NSLog(@"applicationWillEnterForeground: not launched by location manager");
+    }
+
+    [self xxx_applicationWillEnterForeground:application];
 }
 
 - (UIBackgroundTaskIdentifier) backgroundTaskIdentifier {
