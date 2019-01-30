@@ -5,7 +5,7 @@
     <description>Scotts Beacon Monitoring</description>
     <license>Apache 2.0</license>
     <keywords></keywords>
-    <repo>https://github.com/pni-ciklum/scotts-cordova-beacon.git</repo>
+    <repo>https://github.com/iconservo/scotts-cordova-beacon.git</repo>
 
     <dependency id="cordova-plugin-device" version="*" />
 

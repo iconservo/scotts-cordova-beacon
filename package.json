@@ -11,14 +11,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/pni-ciklum/scotts-cordova-beacon.git"
+    "url": "git+https://github.com/iconservo/scotts-cordova-beacon.git"
   },
   "keywords": [
   ],
   "author": "Peter Nilsson <pni@ciklum.com>",
   "license": "Apache 2.0",
   "bugs": {
-    "url": "https://github.com/pni-ciklum/scotts-cordova-beacon/issues"
+    "url": "https://github.com/iconservo/scotts-cordova-beacon/issues"
   },
-  "homepage": "https://github.com/pni-ciklum/scotts-cordova-beacon"
+  "homepage": "https://github.com/iconservo/scotts-cordova-beacon"
 }
