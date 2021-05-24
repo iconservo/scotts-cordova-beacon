@@ -4,8 +4,8 @@ module.exports = function(context) {
 
   var APPLICATION_CLASS = "com.scotts.cordova.beacon.ScottsBeaconApplication";
 
-  var fs = context.requireCordovaModule('fs'),
-      path = context.requireCordovaModule('path');
+  var fs = require('fs'),
+      path = require('path');
 
   var platformRoot = path.join(context.opts.projectRoot, 'platforms/android');
   var manifestFile = path.join(platformRoot, 'app/src/main/AndroidManifest.xml');
